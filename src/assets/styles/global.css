@@ -1,0 +1,71 @@
+* {
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    list-style: none;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: black;
+    font-family: var(--font-family);
+}
+
+html {
+    font-size: 62.5%;
+}
+
+:root {
+    /* Colors */
+    --color-black: #000000;
+    --color-black-2: #1D1D1D;
+    --color-black-3: #282828;
+    --color-white: #FFFFFF;
+    --color-gray-1: #333333;
+    --color-gray-2: #4F4F4F;
+    --color-gray-3: #828282;
+    --color-gray-4: #BDBDBD;
+    --color-gray-5: #E0E0E0;
+    --color-gray-6: #F6F6F6;
+
+    --color-primary: #86A65B;
+    --color-green-detail: #B1BC81;
+    --color-swamp: #E4DFB5;
+    --color-secondary: #FDE2BB;
+
+    --color-orange: #FF8D28;
+    --color-red: #FF383C;
+    --color-yellow: #FFCC00;
+    --color-green: #34C759;
+    --color-mint: #00C8B3;
+    --color-brown: #AC7F5E;
+    --color-indigo: #6155F5;
+    --color-blue: #0088FF;
+
+    /* Fonts - Poppins */
+    --font-family: 'Poppins', sans-serif;
+
+    --font-headline-1-size: clamp(1.5rem, 1.75rem, 2rem);
+    --font-headline-1-weight: 700;
+
+    --font-headline-2-size: clamp(1.20rem, 1.375rem, 1.75rem);
+    --font-headline-2-weight: 600;
+
+    --font-headline-3-size: clamp(1.8rem, 1vw + 1rem, 2rem);
+    --font-headline-3-weight: 600;
+
+    --font-subtitle-size: clamp(0.50rem, 0.75rem, 1.2rem);
+    --font-subtitle-weight: 600;
+
+    --font-body-size: clamp(0.50rem, 0.75rem, 1.2rem);
+    --font-body-weight: 400;
+
+    --font-button-size: clamp(0.50rem, 0.75rem, 1.2rem);
+    --font-button-weight: 400;
+
+    --font-detail-size: clamp(0.25rem, 0.5rem, 0.75rem);
+    --font-detail-weight: 400;
+
+    /* Effects */
+    --effect-box-shadow: 0px 3px 10px rgba(40, 40, 40, 0.25);
+    --color-disabled-button: #c0c0c0;
+
+}
