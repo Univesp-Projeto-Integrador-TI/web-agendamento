@@ -1,0 +1,41 @@
+@import url('./global.css');
+
+header{
+    display: flex;
+    flex-direction: column;
+
+    .header-title-page {
+        padding: 20px 30px;
+        h1 {
+            color: var(--color-primary);
+        }
+        box-shadow: var(--effect-box-shadow);
+    }
+
+    .header-nav-bar {
+        padding: 30px 60px;
+        box-shadow: var(--effect-box-shadow);
+        ul {
+            display: flex;
+            justify-content: space-around;
+            
+            a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+        }
+    }
+}
+
+.select-page {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 6px;
+    padding: 5px 16px;
+
+    svg path{
+        fill: var(--color-white);
+    }
+}
+
