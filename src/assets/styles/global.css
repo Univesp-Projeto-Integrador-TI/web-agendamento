@@ -69,3 +69,20 @@
     --color-disabled-button: #c0c0c0;
 
 }
+
+p {
+    font-size: var(--font-body-size);
+    font-weight: var(--font-body-weight);
+}
+
+.button-primary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--font-button-size);
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 6px;
+    padding: 6px 16px;
+    cursor: pointer;
+}

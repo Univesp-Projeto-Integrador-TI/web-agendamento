@@ -17,12 +17,79 @@ header{
         box-shadow: var(--effect-box-shadow);
         ul {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-evenly;
             
             a {
+                font-size: var(--font-body-size);
                 display: flex;
                 align-items: center;
                 gap: 12px;
+            }
+        }
+    }
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 28px;
+
+    .section-bar-agendamento {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        .group-agendamento {
+            display: flex;
+            align-items: center;
+            gap: 400px;
+            padding: 18px 0px;
+
+            .info-text {
+                h2 {
+                    color: var(--color-primary);
+                    font-size: var(--font-headline-2-size);
+                    font-weight: var(--font-headline-2-weight);
+                }
+            }
+        }
+
+        .group-pesquisa {
+            display: grid;
+            grid-template-columns: 0.25fr 2fr;
+            gap: 6px;
+
+            input {
+                padding: 5px 10px;
+                cursor: pointer;
+                color: var(--color-gray-3);
+                background-color: var(--color-gray-6);
+                border-radius: 6px;
+                border: 1.5px solid var(--color-gray-5);
+            }
+
+            .input-search::placeholder {
+                color: var(--color-gray-3);
+            }
+
+            .search-bar {
+                width: 100%;
+                display: flex;
+                align-items: center;
+
+                .search-button {
+                    display: flex;
+                    background: none;
+                    cursor: pointer;
+                    position: absolute;
+                    margin-left: 10px;
+                }
+                
+                input {
+                    padding: 5px 35px;
+                    width: 100%;
+                    cursor: auto;
+                }
             }
         }
     }
@@ -37,5 +104,13 @@ header{
     svg path{
         fill: var(--color-white);
     }
+}
+
+.icon-search path {
+    stroke: var(--color-gray-3);
+}
+
+.icon-plus path {
+    fill: var(--color-white);
 }
 
