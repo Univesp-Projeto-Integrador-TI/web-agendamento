@@ -42,3 +42,4 @@ overlayCard.addEventListener("click", (e) => {
         closeModalCard();
     }
 });
+
