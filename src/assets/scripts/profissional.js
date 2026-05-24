@@ -5,59 +5,66 @@ const cancelar = document.getElementById("cancelar");
 const salvar = document.getElementById("salvar");
 const tabela = document.getElementById("tabela");
 
-let editIndex = null;
+let profissionais = [];
+let editId = null;
 
 
-function salvarProfissionais() {
-  localStorage.setItem("profissionais", JSON.stringify(profissionais));
+// Carrega profissionais da API
+
+async function carregarProfissionais() {
+  try {
+    const res = await fetch("http://localhost:3000/api/funcionarios");
+    profissionais = await res.json();
+
+    render();
+  } catch (err) {
+    console.error("Erro ao carregar profissionais:", err);
+  }
 }
 
-
-let profissionais = JSON.parse(localStorage.getItem("profissionais")) || [
-  { nome: "Padrão", servico: "Serviço Padrão" }
-];
-
-render();
+carregarProfissionais();
 
 
+// Renderização de profissionais
 
-// RENDER
 function render() {
-  tabela.innerHTML = "";
+  let html = "";
 
-  profissionais.forEach((p, index) => {
-    tabela.innerHTML += `
+  profissionais.forEach((p) => {
+    html += `
       <tr>
         <td>${p.nome}</td>
         <td>${p.servico}</td>
         <td>
-            <button class="editar" data-id="${index}">
-              <img src="../images/icon-pencil.svg" alt="editar" draggable="false">
-            </button>
+          <button class="editar" data-id="${p.id_funcionario}">
+            <img src="../images/icon-pencil.svg">
+          </button>
 
-            <button class="excluir" data-id="${index}">
-              <img src="../images/icon-trash.svg" alt="excluir" draggable="false">
-            </button>
+          <button class="excluir" data-id="${p.id_funcionario}">
+            <img src="../images/icon-trash.svg">
+          </button>
         </td>
       </tr>
     `;
   });
+
+  tabela.innerHTML = html;
 }
 
-render();
 
+// Abre o Modal
 
-// ABRIR MODAL
 btnNovo.addEventListener("click", () => {
   modal.style.display = "flex";
-  editIndex = null;
+  editId = null;
 
-  document.getElementById("nome").value = "";
-  document.getElementById("servico").value = "Psicologia";
+  nome.value = "";
+  servico.selectedIndex = 0;
 });
 
 
-// FECHAR
+// Fecha o Modal
+
 function fecharModal() {
   modal.style.display = "none";
 }
@@ -66,31 +73,56 @@ fechar.addEventListener("click", fecharModal);
 cancelar.addEventListener("click", fecharModal);
 
 
-// SALVAR
-salvar.addEventListener("click", () => {
-  const nome = document.getElementById("nome").value;
-  const servico = document.getElementById("servico").value;
+// Salva os dados na API
 
-  if (!nome || !servico) {
+salvar.addEventListener("click", async () => {
+  const nomeValue = nome.value;
+  const servicoValue = servico.value;
+
+  if (!nomeValue || !servicoValue) {
     alert("Preencha todos os campos!");
     return;
   }
 
-  if (editIndex !== null) {
-    profissionais[editIndex] = { nome, servico };
-  } else {
-    profissionais.push({ nome, servico });
+  try {
+    if (editId) {
+      // Editar
+      await fetch(`http://localhost:3000/api/funcionarios/${editId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nome: nome.value,
+          servico: servicoValue
+        })
+      });
+    } else {
+      // Criar
+      await fetch("http://localhost:3000/api/funcionarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nome: nome.value,
+          servico: servicoValue
+        })
+      });
+    }
+
+    fecharModal();
+    carregarProfissionais();
+
+  } catch (err) {
+    console.error("Erro ao salvar:", err);
   }
-
-  salvarProfissionais();
-
-  fecharModal();
-  render();
 });
 
 
-// EDITAR / EXCLUIR
-tabela.addEventListener("click", (e) => {
+// Editar e Excluir
+
+tabela.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
 
   if (!btn) return;
@@ -98,22 +130,27 @@ tabela.addEventListener("click", (e) => {
   const id = btn.dataset.id;
 
   if (btn.classList.contains("editar")) {
-    const p = profissionais[id];
+    const p = profissionais.find(p => p.id_funcionario == id);
 
-    document.getElementById("nome").value = p.nome;
-    document.getElementById("servico").value = p.servico;
+    nome.value = p.nome;
+    servico.value = p.servico;
 
-    editIndex = id;
+    editId = id;
     modal.style.display = "flex";
   }
 
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir este profissional?")) {
-      profissionais.splice(id, 1);
+      try {
+        await fetch(`http://localhost:3000/api/funcionarios/${id}`, {
+          method: "DELETE"
+        });
 
-      salvarProfissionais();
+        carregarProfissionais();
 
-      render();
+      } catch (err) {
+        console.error("Erro ao excluir:", err);
+      }
     }
   }
 });

@@ -4,104 +4,151 @@ const fechar = document.getElementById("fecharModal");
 const salvar = document.getElementById("salvarSala");
 const tabela = document.getElementById("tabelaSalas");
 
-let editIndex = null;
+let salas = [];
+let editId = null;
 
-// Nome sala
-function salvarSalas() {
-  localStorage.setItem("salas", JSON.stringify(salas));
+
+// Carrega salas da API
+
+async function carregarSalas() {
+  try {
+    const res = await fetch("http://localhost:3000/api/salas");
+    salas = await res.json();
+
+    render();
+  } catch (err) {
+    console.error("Erro ao carregar salas:", err);
+  }
 }
 
-
-let salas = JSON.parse(localStorage.getItem("salas")) || [
-  { nome: "Sala 1" }
-];
-render();
+carregarSalas();
 
 
-// RENDER
+// Renderização de salas
+
 function render() {
-  tabela.innerHTML = "";
+  let html = "";
 
-  salas.forEach((sala, index) => {
-    tabela.innerHTML += `
+  salas.forEach((s) => {
+    html += `
       <tr>
-        <td>${sala.nome}</td>
+        <td>${s.descricao_sala}</td>
         <td>
-            <button class="editar" data-id="${index}">
-              <img src="../images/icon-pencil.svg" alt="editar" draggable="false">
+            <button class="editar" data-id="${s.id_sala}">
+              <img src="/src/assets/images/icon-pencil.svg">
             </button>
 
-            <button class="excluir" data-id="${index}">
-              <img src="../images/icon-trash.svg" alt="excluir" draggable="false">
+            <button class="excluir" data-id="${s.id_sala}">
+              <img src="/src/assets/images/icon-trash.svg">
             </button>
         </td>
       </tr>
     `;
   });
-}
-render();
 
-// ABRIR MODAL
+  tabela.innerHTML = html;
+}
+
+// Abrir modais
+
 btnNova.addEventListener("click", () => {
   modal.style.display = "flex";
-  editIndex = null;
+  editId = null; // ✅ reset modo edição
 
-  document.getElementById("nomeSala").value = "";
+  nomeSala.value = "";
 });
 
+// Fechar modais
 
-// FECHAR MODAL
 fechar.addEventListener("click", () => {
   modal.style.display = "none";
 });
 
+// Salvar sala (criar ou editar)
 
-// SALVAR
-salvar.addEventListener("click", () => {
-  const nome = document.getElementById("nomeSala").value;
+salvar.addEventListener("click", async () => {
+  const nome = nomeSala.value.trim();
 
   if (!nome) {
     alert("Preencha o nome da sala!");
     return;
   }
 
-  if (editIndex !== null) {
-    salas[editIndex] = { nome };
-  } else {
-    salas.push({ nome });
+  try {
+    const url = editId
+      ? `http://localhost:3000/api/salas/${editId}`
+      : "http://localhost:3000/api/salas";
+
+    const method = editId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        descricao_sala: nome
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    modal.style.display = "none";
+    editId = null;
+
+    carregarSalas();
+
+  } catch (err) {
+    console.error("Erro ao salvar sala:", err);
   }
-
-  salvarSalas()
-
-  modal.style.display = "none";
-  render();
 });
 
 
-// EDITAR / EXCLUIR
-tabela.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
+// Editar e Excluir
 
+tabela.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button");
   if (!btn) return;
 
   const id = btn.dataset.id;
 
+  // EDITAR
   if (btn.classList.contains("editar")) {
-    const sala = salas[id];
+    const sala = salas.find(s => s.id_sala == id);
 
-    document.getElementById("nomeSala").value = sala.nome;
+    if (!sala) return;
 
-    editIndex = id;
+    nomeSala.value = sala.descricao_sala;
+    editId = id;
+
     modal.style.display = "flex";
   }
 
+  // EXCLUIR
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir esta sala?")) {
-      salas.splice(id, 1);
+      try {
+        const res = await fetch(`http://localhost:3000/api/salas/${id}`, {
+          method: "DELETE"
+        });
 
-      salvarSalas();
+        const data = await res.json();
 
-      render();
+        if (!res.ok) {
+          alert(data.error);
+          return;
+        }
+
+        carregarSalas();
+
+      } catch (err) {
+        console.error("Erro ao excluir sala:", err);
+      }
     }
   }
 });

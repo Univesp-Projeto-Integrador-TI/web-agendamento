@@ -5,14 +5,36 @@ const closeBtn = document.getElementById("closeModal");
 const lista = document.getElementById("lista");
 const form = document.getElementById("form");
 
-let editIndex = null;
+let profissionais = [];
+let salas = [];
+let agendamentos = [];
 
-// dados
-const salas = JSON.parse(localStorage.getItem("salas")) || [];
-const profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
+let editId = null; // Controle - gamb- edição
 
-let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
-render();
+
+// Carrega dados da API
+
+async function carregarDados() {
+  try {
+    const [resSalas, resProf, resAg] = await Promise.all([
+      fetch("http://localhost:3000/api/salas"),
+      fetch("http://localhost:3000/api/funcionarios"),
+      fetch("http://localhost:3000/api/atendimentos")
+    ]);
+
+    salas = await resSalas.json();
+    profissionais = await resProf.json();
+    agendamentos = await resAg.json();
+
+    render();
+  } catch (err) {
+    console.error("Erro ao carregar dados:", err);
+  }
+}
+
+carregarDados();
+
+// Atualiza selects de Profissionais e Salas no Modal
 
 function carregarSelects() {
   const selectServico = document.getElementById("servico");
@@ -21,25 +43,18 @@ function carregarSelects() {
   selectServico.innerHTML = "";
   selectSala.innerHTML = "";
 
-  // SERVIÇOS 
   const servicosUnicos = [...new Set(profissionais.map(p => p.servico))];
 
   servicosUnicos.forEach(s => {
-    selectServico.innerHTML += `
-      <option value="${s}">${s}</option>
-    `;
+    selectServico.innerHTML += `<option value="${s}">${s}</option>`;
   });
 
-  // SALAS
   salas.forEach(s => {
-    selectSala.innerHTML += `
-      <option value="${s.nome}">${s.nome}</option>
-    `;
+    selectSala.innerHTML += `<option value="${s.id_sala}">${s.descricao_sala}</option>`;
   });
 
   atualizarProfissionais();
 }
-
 
 function atualizarProfissionais() {
   const select = document.getElementById("profissional");
@@ -52,183 +67,185 @@ function atualizarProfissionais() {
   );
 
   filtrados.forEach(p => {
-    select.innerHTML += `
-      <option value="${p.nome}">${p.nome}</option>
-    `;
+    select.innerHTML += `<option value="${p.id_funcionario}">${p.nome}</option>`;
   });
 }
 
-document.getElementById("servico").addEventListener("change", () => {
-  atualizarProfissionais();
-});
+document.getElementById("servico").addEventListener("change", atualizarProfissionais);
 
+//Renderização de agendamentos
 
-// render
 function render() {
   lista.innerHTML = "";
 
-  agendamentos.forEach((a, index) => {
+  agendamentos.forEach((a) => {
     lista.innerHTML += `
       <div class="card">
 
         <div class="card-header">
-          <strong>${a.cliente}</strong>
+          <strong>${a.nome_cliente}</strong>
 
           <span class="acoes">
-            <button class="editar" data-id="${index}">
-              <img src="./src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
+            <button class="editar" data-id="${a.id_atendimento}">
+              <img src="/src/assets/images/icon-pencil.svg">
             </button>
 
-            <button class="excluir" data-id="${index}">
-              <img src="./src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
+            <button class="excluir" data-id="${a.id_atendimento}">
+              <img src="/src/assets/images/icon-trash.svg">
             </button>
           </span>
         </div>
 
         <div class="card-body">
-          <p>${a.servico}</p>
-          <p><img src="./src/assets/images/icon-calendar.svg" alt="data" draggable="false">${formatarData(a.data)}</p>
-          <p><img src="./src/assets/images/icon-clock.svg" alt="horário" draggable="false">${a.inicio} - ${a.fim}</p>
-          <p><img src="./src/assets/images/icon-group-people.svg" alt="profissional" draggable="false">${a.profissional}</p>
-          <p><img src="./src/assets/images/icon-door-room.svg" alt="sala" draggable="false">${a.sala}</p>
+          <p><b>Serviço:</b> ${a.servico_prestado}</p>
+          <p><b>Profissional:</b> ${a.nome_funcionario}</p>
+          <p><b>Sala:</b> ${a.nome_sala}</p>
+          <p><b>Data:</b> ${formatarData(a.data_hora_inicio)}</p>
+          <p><b>Horário:</b> ${formatarHora(a.data_hora_inicio)} - ${formatarHora(a.data_hora_fim)}</p>
         </div>
 
       </div>
     `;
   });
-  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
 }
 
+// Modal
 
-// abrir modal
 openBtn.addEventListener("click", () => {
   overlay.style.display = "flex";
   form.reset();
-  editIndex = null;
+  editId = null; // Resete do Modal
 
   carregarSelects();
   setarDataAtual();
 });
 
-
-// fechar
 function fechar() {
   overlay.style.display = "none";
 }
 
 closeBtn.addEventListener("click", fechar);
 
-overlay.addEventListener("click", (e) => {
-  if (e.target === overlay) fechar();
-});
 
+// Salvar (criar ou editar)
 
-// salvar
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const novo = {
-    cliente: cliente.value,
-    servico: servico.value,
-    profissional: profissional.value,
-    sala: sala.value,
-    data: data.value,
-    inicio: inicio.value,
-    fim: fim.value
-  };
+  const cliente = document.getElementById("cliente").value.trim();
+  const servico = document.getElementById("servico").value;
+  const data = document.getElementById("data").value;
+  const inicio = document.getElementById("inicio").value;
+  const fim = document.getElementById("fim").value;
+  const profissional = document.getElementById("profissional").value;
+  const sala = document.getElementById("sala").value;
 
-  const conflito = agendamentos.some((a, index) =>
-    index !== editIndex &&
-    a.data === novo.data &&
-    a.sala === novo.sala &&
-    (
-      (novo.inicio >= a.inicio && novo.inicio < a.fim) ||
-      (novo.fim > a.inicio && novo.fim <= a.fim)
-    )
-  );
-
-  if (conflito) {
-    alert("Essa sala já está ocupada nesse horário!");
+  if (!cliente || !servico || !data || !inicio || !fim || !profissional || !sala) {
+    alert("Preencha todos os campos!");
     return;
   }
 
-  if (editIndex !== null) {
-    agendamentos[editIndex] = novo;
-  } else {
-    agendamentos.push(novo);
-  }
+  const dataInicio = `${data}T${inicio}:00`;
+  const dataFim = `${data}T${fim}:00`;
 
-  render();
-  fechar();
+  try {
+    const url = editId
+      ? `http://localhost:3000/api/atendimento/${editId}`
+      : "http://localhost:3000/api/atendimento";
+
+    const method = editId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nome_cliente: cliente,
+        servico_prestado: servico,
+        data_hora_inicio: dataInicio,
+        data_hora_fim: dataFim,
+        id_funcionario: profissional,
+        id_sala: sala
+      })
+    });
+
+    const dataRes = await res.json();
+
+    if (!res.ok) {
+      alert(dataRes.error);
+      return;
+    }
+
+    await carregarDados();
+    fechar();
+    editId = null;
+
+  } catch (err) {
+    console.error("Erro ao salvar:", err);
+  }
 });
 
+//Excluir e Editar
 
-// editar e excluir
-lista.addEventListener("click", (e) => {
+lista.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
-
   if (!btn) return;
 
   const id = btn.dataset.id;
 
+  // Editar
   if (btn.classList.contains("editar")) {
-    const a = agendamentos[id];
+    const a = agendamentos.find(a => a.id_atendimento == id);
 
-    cliente.value = a.cliente;
-    servico.value = a.servico;
-    profissional.value = a.profissional;
-    sala.value = a.sala;
-    inicio.value = a.inicio;
-    fim.value = a.fim;
+    editId = a.id_atendimento;
 
-    editIndex = id;
     overlay.style.display = "flex";
+
+    carregarSelects();
+
+    setTimeout(() => {
+      document.getElementById("cliente").value = a.nome_cliente;
+      document.getElementById("servico").value = a.servico_prestado;
+
+      atualizarProfissionais();
+
+      document.getElementById("profissional").value = a.id_funcionario;
+      document.getElementById("sala").value = a.id_sala;
+
+      document.getElementById("data").value = a.data_hora_inicio.split("T")[0];
+      document.getElementById("inicio").value = a.data_hora_inicio.split("T")[1].slice(0, 5);
+      document.getElementById("fim").value = a.data_hora_fim.split("T")[1].slice(0, 5);
+    }, 0);
   }
 
-    if (btn.classList.contains("excluir")) {
-    const confirmar = confirm("Tem certeza que deseja excluir este agendamento?");
+  // Excluir
+  if (btn.classList.contains("excluir")) {
+    if (confirm("Deseja excluir este agendamento?")) {
+      await fetch(`http://localhost:3000/api/atendimento/${id}`, {
+        method: "DELETE"
+      });
 
-    if (confirmar) {
-        agendamentos.splice(id, 1);
-        render();
+      await carregarDados();
     }
-    }
+  }
 });
 
-document.getElementById("dataAtual").textContent = formatarDataAtual();
-function formatarDataAtual() {
-  const data = new Date();
 
-  const dias = [
-    "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira",
-    "Quinta-feira", "Sexta-feira", "Sábado"
-  ];
+// Utilidades
 
-  const meses = [
-    "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-    "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
-  ];
-
-  const diaSemana = dias[data.getDay()];
-  const dia = data.getDate();
-  const mes = meses[data.getMonth()];
-  const ano = data.getFullYear();
-
-  return `${diaSemana}, ${dia} de ${mes} de ${ano}`;
+function setarDataAtual() {
+  document.getElementById("data").value =
+    new Date().toISOString().split("T")[0];
 }
 
 function formatarData(dataString) {
-  const data = new Date(dataString + "T00:00:00");
-
-  const dia = data.getDate();
-  const mes = data.getMonth() + 1;
-  const ano = data.getFullYear();
-
-  return `${dia}/${mes}/${ano}`;
+  return new Date(dataString).toLocaleDateString("pt-BR");
 }
 
-
-function setarDataAtual() {
-  const hoje = new Date().toISOString().split("T")[0];
-  document.getElementById("data").value = hoje;
+function formatarHora(dataString) {
+  return new Date(dataString).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
 }
