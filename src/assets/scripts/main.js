@@ -35,9 +35,10 @@ function render() {
 
         <div class="card-body">
           <p>${a.servico}</p>
-          <p>${a.inicio} - ${a.fim}</p>
-          <p>${a.profissional}</p>
-          <p>${a.sala}</p>
+          <p><img src="./src/assets/images/icon-calendar.svg" alt="data" draggable="false">${formatarData(a.data)}</p>
+          <p><img src="./src/assets/images/icon-clock.svg" alt="horário" draggable="false">${a.inicio} - ${a.fim}</p>
+          <p><img src="./src/assets/images/icon-group-people.svg" alt="profissional" draggable="false">${a.profissional}</p>
+          <p><img src="./src/assets/images/icon-door-room.svg" alt="sala" draggable="false">${a.sala}</p>
         </div>
 
       </div>
@@ -75,6 +76,7 @@ form.addEventListener("submit", (e) => {
     servico: servico.value,
     profissional: profissional.value,
     sala: sala.value,
+    data: data.value,
     inicio: inicio.value,
     fim: fim.value
   };
@@ -138,4 +140,14 @@ function formatarDataAtual() {
   const ano = data.getFullYear();
 
   return `${diaSemana}, ${dia} de ${mes} de ${ano}`;
+}
+
+function formatarData(dataString) {
+  const data = new Date(dataString + "T00:00:00");
+
+  const dia = data.getDate();
+  const mes = data.getMonth() + 1;
+  const ano = data.getFullYear();
+
+  return `${dia}/${mes}/${ano}`;
 }
