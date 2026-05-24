@@ -116,10 +116,14 @@ lista.addEventListener("click", (e) => {
     overlay.style.display = "flex";
   }
 
-  if (btn.classList.contains("excluir")) {
-    agendamentos.splice(id, 1);
-    render();
-  }
+    if (btn.classList.contains("excluir")) {
+    const confirmar = confirm("Tem certeza que deseja excluir este agendamento?");
+
+    if (confirmar) {
+        agendamentos.splice(id, 1);
+        render();
+    }
+    }
 });
 
 document.getElementById("dataAtual").textContent = formatarDataAtual();
