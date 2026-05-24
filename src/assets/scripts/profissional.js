@@ -7,9 +7,18 @@ const tabela = document.getElementById("tabela");
 
 let editIndex = null;
 
-let profissionais = [
-  { nome: "Ana", servico: "Psicologia" }
+
+function salvarProfissionais() {
+  localStorage.setItem("profissionais", JSON.stringify(profissionais));
+}
+
+
+let profissionais = JSON.parse(localStorage.getItem("profissionais")) || [
+  { nome: "Padrão", servico: "Serviço Padrão" }
 ];
+
+render();
+
 
 
 // RENDER
@@ -73,6 +82,8 @@ salvar.addEventListener("click", () => {
     profissionais.push({ nome, servico });
   }
 
+  salvarProfissionais();
+
   fecharModal();
   render();
 });
@@ -99,6 +110,9 @@ tabela.addEventListener("click", (e) => {
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir este profissional?")) {
       profissionais.splice(id, 1);
+
+      salvarProfissionais();
+
       render();
     }
   }
