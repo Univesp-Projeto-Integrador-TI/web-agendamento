@@ -12,7 +12,7 @@ let profissionais = [
 ];
 
 
-// ✅ RENDER
+// RENDER
 function render() {
   tabela.innerHTML = "";
 
@@ -22,8 +22,13 @@ function render() {
         <td>${p.nome}</td>
         <td>${p.servico}</td>
         <td>
-          <button class="editar" data-id="${index}">✏️</button>
-          <button class="excluir" data-id="${index}">🗑️</button>
+            <button class="editar" data-id="${index}">
+              <img src="./src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
+            </button>
+
+            <button class="excluir" data-id="${index}">
+              <img src="./src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
+            </button>
         </td>
       </tr>
     `;
@@ -33,7 +38,7 @@ function render() {
 render();
 
 
-// ✅ ABRIR MODAL
+// ABRIR MODAL
 btnNovo.addEventListener("click", () => {
   modal.style.display = "flex";
   editIndex = null;
@@ -43,7 +48,7 @@ btnNovo.addEventListener("click", () => {
 });
 
 
-// ✅ FECHAR
+// FECHAR
 function fecharModal() {
   modal.style.display = "none";
 }
@@ -52,7 +57,7 @@ fechar.addEventListener("click", fecharModal);
 cancelar.addEventListener("click", fecharModal);
 
 
-// ✅ SALVAR
+// SALVAR
 salvar.addEventListener("click", () => {
   const nome = document.getElementById("nome").value;
   const servico = document.getElementById("servico").value;
@@ -73,7 +78,7 @@ salvar.addEventListener("click", () => {
 });
 
 
-// ✅ EDITAR / EXCLUIR
+// EDITAR / EXCLUIR
 tabela.addEventListener("click", (e) => {
   const id = e.target.dataset.id;
 
