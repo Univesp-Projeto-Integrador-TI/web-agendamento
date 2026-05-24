@@ -23,11 +23,11 @@ function render() {
         <td>${p.servico}</td>
         <td>
             <button class="editar" data-id="${index}">
-              <img src="./src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
+              <img src="/src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
             </button>
 
             <button class="excluir" data-id="${index}">
-              <img src="./src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
+              <img src="/src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
             </button>
         </td>
       </tr>
@@ -80,9 +80,13 @@ salvar.addEventListener("click", () => {
 
 // EDITAR / EXCLUIR
 tabela.addEventListener("click", (e) => {
-  const id = e.target.dataset.id;
+  const btn = e.target.closest("button");
 
-  if (e.target.classList.contains("editar")) {
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+
+  if (btn.classList.contains("editar")) {
     const p = profissionais[id];
 
     document.getElementById("nome").value = p.nome;
@@ -92,8 +96,10 @@ tabela.addEventListener("click", (e) => {
     modal.style.display = "flex";
   }
 
-  if (e.target.classList.contains("excluir")) {
-    profissionais.splice(id, 1);
-    render();
+  if (btn.classList.contains("excluir")) {
+    if (confirm("Deseja excluir este profissional?")) {
+      profissionais.splice(id, 1);
+      render();
+    }
   }
 });
