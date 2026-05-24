@@ -8,8 +8,60 @@ const form = document.getElementById("form");
 let editIndex = null;
 
 // dados
+const salas = JSON.parse(localStorage.getItem("salas")) || [];
+const profissionais = JSON.parse(localStorage.getItem("profissionais")) || [];
+
 let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
 render();
+
+function carregarSelects() {
+  const selectServico = document.getElementById("servico");
+  const selectSala = document.getElementById("sala");
+
+  selectServico.innerHTML = "";
+  selectSala.innerHTML = "";
+
+  // SERVIÇOS 
+  const servicosUnicos = [...new Set(profissionais.map(p => p.servico))];
+
+  servicosUnicos.forEach(s => {
+    selectServico.innerHTML += `
+      <option value="${s}">${s}</option>
+    `;
+  });
+
+  // SALAS
+  salas.forEach(s => {
+    selectSala.innerHTML += `
+      <option value="${s.nome}">${s.nome}</option>
+    `;
+  });
+
+  atualizarProfissionais();
+}
+
+
+function atualizarProfissionais() {
+  const select = document.getElementById("profissional");
+  const servicoSelecionado = document.getElementById("servico").value;
+
+  select.innerHTML = "";
+
+  const filtrados = profissionais.filter(p =>
+    p.servico === servicoSelecionado
+  );
+
+  filtrados.forEach(p => {
+    select.innerHTML += `
+      <option value="${p.nome}">${p.nome}</option>
+    `;
+  });
+}
+
+document.getElementById("servico").addEventListener("change", () => {
+  atualizarProfissionais();
+});
+
 
 // render
 function render() {
@@ -54,6 +106,7 @@ openBtn.addEventListener("click", () => {
   form.reset();
   editIndex = null;
 
+  carregarSelects();
   setarDataAtual();
 });
 
@@ -83,6 +136,21 @@ form.addEventListener("submit", (e) => {
     inicio: inicio.value,
     fim: fim.value
   };
+
+  const conflito = agendamentos.some((a, index) =>
+    index !== editIndex &&
+    a.data === novo.data &&
+    a.sala === novo.sala &&
+    (
+      (novo.inicio >= a.inicio && novo.inicio < a.fim) ||
+      (novo.fim > a.inicio && novo.fim <= a.fim)
+    )
+  );
+
+  if (conflito) {
+    alert("Essa sala já está ocupada nesse horário!");
+    return;
+  }
 
   if (editIndex !== null) {
     agendamentos[editIndex] = novo;
