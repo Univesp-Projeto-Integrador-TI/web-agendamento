@@ -8,8 +8,8 @@ const form = document.getElementById("form");
 let editIndex = null;
 
 // dados
-let agendamentos = [];
-
+let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+render();
 
 // render
 function render() {
@@ -44,6 +44,7 @@ function render() {
       </div>
     `;
   });
+  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
 }
 
 
