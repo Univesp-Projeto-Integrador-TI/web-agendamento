@@ -71,6 +71,17 @@ th, td {
   text-align: left;
 }
 
+
+td button{
+    text-align: center;
+    margin: 0px 20px 0px 0px;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
