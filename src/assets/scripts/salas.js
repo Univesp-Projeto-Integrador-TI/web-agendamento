@@ -6,12 +6,19 @@ const tabela = document.getElementById("tabelaSalas");
 
 let editIndex = null;
 
-let salas = [
-  { nome: "Sala 1", servico: "Psicologia", prof: "Ana" }
+// Nome sala
+function salvarSalas() {
+  localStorage.setItem("salas", JSON.stringify(salas));
+}
+
+
+let salas = JSON.parse(localStorage.getItem("salas")) || [
+  { nome: "Sala 1" }
 ];
+render();
 
 
-
+// RENDER
 function render() {
   tabela.innerHTML = "";
 
@@ -19,76 +26,82 @@ function render() {
     tabela.innerHTML += `
       <tr>
         <td>${sala.nome}</td>
-        <td>${sala.servico}</td>
-        <td>${sala.prof}</td>
         <td>
-          <button class="editar" data-id="${index}">✏️</button>
-          <button class="excluir" data-id="${index}">🗑️</button>
+            <button class="editar" data-id="${index}">
+              <img src="/src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
+            </button>
+
+            <button class="excluir" data-id="${index}">
+              <img src="/src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
+            </button>
         </td>
       </tr>
     `;
   });
 }
-
 render();
 
-
-
+// ABRIR MODAL
 btnNova.addEventListener("click", () => {
   modal.style.display = "flex";
   editIndex = null;
 
   document.getElementById("nomeSala").value = "";
-  document.getElementById("servicoSala").value = "";
-  document.getElementById("profissionalSala").value = "";
 });
 
 
-
+// FECHAR MODAL
 fechar.addEventListener("click", () => {
   modal.style.display = "none";
 });
 
 
-
+// SALVAR
 salvar.addEventListener("click", () => {
   const nome = document.getElementById("nomeSala").value;
-  const servico = document.getElementById("servicoSala").value;
-  const prof = document.getElementById("profissionalSala").value;
 
-  if (!nome || !servico || !prof) {
-    alert("Preencha todos os campos!");
+  if (!nome) {
+    alert("Preencha o nome da sala!");
     return;
   }
 
   if (editIndex !== null) {
-    salas[editIndex] = { nome, servico, prof };
+    salas[editIndex] = { nome };
   } else {
-    salas.push({ nome, servico, prof });
+    salas.push({ nome });
   }
+
+  salvarSalas()
 
   modal.style.display = "none";
   render();
 });
 
 
-// ✅ AÇÕES (EDITAR / EXCLUIR)
+// EDITAR / EXCLUIR
 tabela.addEventListener("click", (e) => {
-  const id = e.target.dataset.id;
+  const btn = e.target.closest("button");
 
-  if (e.target.classList.contains("editar")) {
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+
+  if (btn.classList.contains("editar")) {
     const sala = salas[id];
 
     document.getElementById("nomeSala").value = sala.nome;
-    document.getElementById("servicoSala").value = sala.servico;
-    document.getElementById("profissionalSala").value = sala.prof;
 
     editIndex = id;
     modal.style.display = "flex";
   }
 
-  if (e.target.classList.contains("excluir")) {
-    salas.splice(id, 1);
-    render();
+  if (btn.classList.contains("excluir")) {
+    if (confirm("Deseja excluir esta sala?")) {
+      salas.splice(id, 1);
+
+      salvarSalas();
+
+      render();
+    }
   }
 });
