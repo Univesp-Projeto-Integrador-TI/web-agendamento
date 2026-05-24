@@ -1,0 +1,31 @@
+# arquivo para testar as rotas da api
+
+### teste rota de cadatro de agendamento
+POST http://localhost:3000/api/atendimento
+Content-Type: application/json
+
+{
+  "data_hora_inicio": "2026-07-25T16:00:00",
+  "data_hora_fim": "2026-07-25T16:30:00",
+  "observacoes": "Primeira consulta do cliente",
+  "id_funcionario": 1,
+  "id_sala": 2
+}
+
+### teste rota cadastro de salas
+POST http://localhost:3000/api/salas
+Content-Type: application/json
+
+{
+  "descricao_sala": "Sala 10",
+  "especialidade": "Massoterapia"
+}
+
+### teste rota cadastro de funcionários
+POST http://localhost:3000/api/funcionarios
+Content-Type: application/json
+
+{
+  "nome": "Julia Silveira",
+  "especialidade": "Massoterapia"
+}
