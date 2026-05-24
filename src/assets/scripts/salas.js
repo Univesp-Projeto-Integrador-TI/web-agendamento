@@ -28,11 +28,11 @@ function render() {
         <td>${sala.nome}</td>
         <td>
             <button class="editar" data-id="${index}">
-              <img src="/src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
+              <img src="../src/assets/images/icon-pencil.svg" alt="editar" draggable="false">
             </button>
 
             <button class="excluir" data-id="${index}">
-              <img src="/src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
+              <img src="../src/assets/images/icon-trash.svg" alt="excluir" draggable="false">
             </button>
         </td>
       </tr>
