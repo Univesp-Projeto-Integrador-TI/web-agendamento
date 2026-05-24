@@ -35,11 +35,11 @@ function render() {
         <td>${s.descricao_sala}</td>
         <td>
             <button class="editar" data-id="${s.id_sala}">
-              <img src="/src/assets/images/icon-pencil.svg">
+              <img src="../images/icon-pencil.svg">
             </button>
 
             <button class="excluir" data-id="${s.id_sala}">
-              <img src="/src/assets/images/icon-trash.svg">
+              <img src="../images/icon-trash.svg">
             </button>
         </td>
       </tr>
