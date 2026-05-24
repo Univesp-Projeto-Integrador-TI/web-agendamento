@@ -52,6 +52,8 @@ openBtn.addEventListener("click", () => {
   overlay.style.display = "flex";
   form.reset();
   editIndex = null;
+
+  setarDataAtual();
 });
 
 
@@ -150,4 +152,10 @@ function formatarData(dataString) {
   const ano = data.getFullYear();
 
   return `${dia}/${mes}/${ano}`;
+}
+
+
+function setarDataAtual() {
+  const hoje = new Date().toISOString().split("T")[0];
+  document.getElementById("data").value = hoje;
 }
