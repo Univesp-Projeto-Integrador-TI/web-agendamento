@@ -17,9 +17,9 @@ let editId = null; // Controle - gamb- edição
 async function carregarDados() {
   try {
     const [resSalas, resProf, resAg] = await Promise.all([
-      fetch("http://localhost:3000/api/salas"),
-      fetch("http://localhost:3000/api/funcionarios"),
-      fetch("http://localhost:3000/api/atendimentos")
+      fetch("https://web-agendamento-1.onrender.com/api/salas"),
+      fetch("https://web-agendamento-1.onrender.com/api/funcionarios"),
+      fetch("https://web-agendamento-1.onrender.com/api/atendimentos")
     ]);
 
     salas = await resSalas.json();
@@ -150,8 +150,8 @@ form.addEventListener("submit", async (e) => {
 
   try {
     const url = editId
-      ? `http://localhost:3000/api/atendimento/${editId}`
-      : "http://localhost:3000/api/atendimento";
+      ? `https://web-agendamento-1.onrender.com/api/atendimento/${editId}`
+      : "https://web-agendamento-1.onrender.com/api/atendimento";
 
     const method = editId ? "PUT" : "POST";
 
@@ -222,7 +222,7 @@ lista.addEventListener("click", async (e) => {
   // Excluir
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir este agendamento?")) {
-      await fetch(`http://localhost:3000/api/atendimento/${id}`, {
+      await fetch(`https://web-agendamento-1.onrender.com/api/atendimento/${id}`, {
         method: "DELETE"
       });
 

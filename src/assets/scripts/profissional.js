@@ -13,7 +13,7 @@ let editId = null;
 
 async function carregarProfissionais() {
   try {
-    const res = await fetch("http://localhost:3000/api/funcionarios");
+    const res = await fetch("https://web-agendamento-1.onrender.com/api/funcionarios");
     profissionais = await res.json();
 
     render();
@@ -87,7 +87,7 @@ salvar.addEventListener("click", async () => {
   try {
     if (editId) {
       // Editar
-      await fetch(`http://localhost:3000/api/funcionarios/${editId}`, {
+      await fetch(`https://web-agendamento-1.onrender.com/api/funcionarios/${editId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -99,7 +99,7 @@ salvar.addEventListener("click", async () => {
       });
     } else {
       // Criar
-      await fetch("http://localhost:3000/api/funcionarios", {
+      await fetch("https://web-agendamento-1.onrender.com/api/funcionarios", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -142,7 +142,7 @@ tabela.addEventListener("click", async (e) => {
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir este profissional?")) {
       try {
-        await fetch(`http://localhost:3000/api/funcionarios/${id}`, {
+        await fetch(`https://web-agendamento-1.onrender.com/api/funcionarios/${id}`, {
           method: "DELETE"
         });
 

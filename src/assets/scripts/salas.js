@@ -12,7 +12,7 @@ let editId = null;
 
 async function carregarSalas() {
   try {
-    const res = await fetch("http://localhost:3000/api/salas");
+    const res = await fetch("https://web-agendamento-1.onrender.com/api/salas");
     salas = await res.json();
 
     render();
@@ -53,7 +53,7 @@ function render() {
 
 btnNova.addEventListener("click", () => {
   modal.style.display = "flex";
-  editId = null; // ✅ reset modo edição
+  editId = null; // reset modo edição
 
   nomeSala.value = "";
 });
@@ -76,8 +76,8 @@ salvar.addEventListener("click", async () => {
 
   try {
     const url = editId
-      ? `http://localhost:3000/api/salas/${editId}`
-      : "http://localhost:3000/api/salas";
+      ? `https://web-agendamento-1.onrender.com/api/salas/${editId}`
+      : "https://web-agendamento-1.onrender.com/api/salas";
 
     const method = editId ? "PUT" : "POST";
 
@@ -133,7 +133,7 @@ tabela.addEventListener("click", async (e) => {
   if (btn.classList.contains("excluir")) {
     if (confirm("Deseja excluir esta sala?")) {
       try {
-        const res = await fetch(`http://localhost:3000/api/salas/${id}`, {
+        const res = await fetch(`https://web-agendamento-1.onrender.com/api/salas/${id}`, {
           method: "DELETE"
         });
 
