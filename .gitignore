@@ -1,5 +1,8 @@
-database/*.db
-database/*.sqlite
-database/*.sqlite3
+# Banco de dados dentro da pasta backend
+backend/database/*.db
+backend/database/*.sqlite
+backend/database/*.sqlite3
+
+# Pastas de sistema e dependências
+backend/node_modules/
 .vscode/
-node_modules/
