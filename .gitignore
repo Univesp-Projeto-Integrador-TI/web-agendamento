@@ -2,3 +2,4 @@ database/*.db
 database/*.sqlite
 database/*.sqlite3
 .vscode/
+node_modules/
